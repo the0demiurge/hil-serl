@@ -1,5 +1,5 @@
 import rospy
-from franka_gripper.msg import GraspActionGoal, MoveActionGoal, StopAction
+from franka_gripper.msg import GraspActionGoal, MoveActionGoal
 from sensor_msgs.msg import JointState
 import numpy as np
 
@@ -15,9 +15,6 @@ class FrankaGripperServer(GripperServer):
         self.grippergrasppub = rospy.Publisher(
             "/franka_gripper/grasp/goal", GraspActionGoal, queue_size=1
         )
-        self.gripperstoppub = rospy.Publisher(
-            "/franka_gripper/stop/goal", StopAction, queue_size=1
-        )
         self.gripper_sub = rospy.Subscriber(
             "/franka_gripper/joint_states", JointState, self._update_gripper
         )
@@ -26,13 +23,12 @@ class FrankaGripperServer(GripperServer):
     def open(self):
         if self.binary_gripper_pose == 0:
             return
-        self.gripperstoppub(StopAction())
         msg = MoveActionGoal()
         # msg.goal.width = 0.025
         msg.goal.width = 0.09
         msg.goal.speed = 0.3
-        self.grippermovepub.publish(msg)
         self.binary_gripper_pose = 0
+        self.grippermovepub.publish(msg)
 
     def close(self):
         if self.binary_gripper_pose == 1:
@@ -43,8 +39,8 @@ class FrankaGripperServer(GripperServer):
         msg.goal.epsilon.inner = 1
         msg.goal.epsilon.outer = 1
         msg.goal.force = 20
-        self.grippergrasppub.publish(msg)
         self.binary_gripper_pose = 1
+        self.grippergrasppub.publish(msg)
 
     def close_slow(self):
         if self.binary_gripper_pose == 1:
@@ -55,8 +51,8 @@ class FrankaGripperServer(GripperServer):
         msg.goal.epsilon.inner = 1
         msg.goal.epsilon.outer = 1
         msg.goal.force = 20
-        self.grippergrasppub.publish(msg)
         self.binary_gripper_pose = 1
+        self.grippergrasppub.publish(msg)
 
     def move(self, position: int):
         """Move the gripper to a specific position in range [0, 255]"""
