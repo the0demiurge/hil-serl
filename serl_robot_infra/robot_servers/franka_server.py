@@ -191,7 +191,7 @@ def main(_):
 
     try:
         roscore = subprocess.Popen(f"roscore -p {FLAGS.ros_port}", shell=True)
-        time.sleep(1)
+        time.sleep(10)
     except Exception as e:
         raise Exception("roscore not running", e)
 
